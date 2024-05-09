@@ -1,0 +1,50 @@
+name: Nightwatch Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Test suite'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - bstackdemo
+          - bstackdemo50
+          - bstackdemo100
+
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Nightwatch
+
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Setup Node
+      run: sudo apt install nodejs
+      
+    - name: Node version
+      run: node -v
+      
+    - name: NPM
+      run: sudo apt install npm
+      
+    - name: NPM version
+      run: npm -v
+      
+    - name: npm-install
+      run: npm install
+    
+    - name: Run Nightwatch tests
+      run: npx nightwatch test/${{ inputs.suite }} --headless --env chrome
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: html-report
+        path: Nightwatch/tests_output/nightwatch-html-report/index.html
